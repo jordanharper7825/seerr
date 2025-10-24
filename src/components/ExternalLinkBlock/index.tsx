@@ -13,12 +13,17 @@ import { MediaType } from '@server/constants/media';
 import { MediaServerType } from '@server/constants/server';
 
 interface ExternalLinkBlockProps {
-  mediaType: 'movie' | 'tv';
+  mediaType: 'movie' | 'tv' | 'music';
   tmdbId?: number;
   tvdbId?: number;
   imdbId?: string;
   rtUrl?: string;
   mediaUrl?: string;
+  musicbrainzId?: string;
+  externalLinks?: Array<{
+    type: string;
+    url: string;
+  }>;
 }
 
 const ExternalLinkBlock = ({
@@ -28,9 +33,73 @@ const ExternalLinkBlock = ({
   imdbId,
   rtUrl,
   mediaUrl,
+  musicbrainzId,
+  externalLinks = [],
 }: ExternalLinkBlockProps) => {
   const settings = useSettings();
   const { locale } = useLocale();
+
+  // For music, use external links and MusicBrainz
+  if (mediaType === 'music') {
+    const spotifyLink = externalLinks.find((link) =>
+      link.type.toLowerCase().includes('spotify')
+    );
+    const appleMusicLink = externalLinks.find((link) =>
+      link.type.toLowerCase().includes('apple')
+    );
+    const lastfmLink = externalLinks.find((link) =>
+      link.type.toLowerCase().includes('last.fm')
+    );
+
+    return (
+      <div className="flex w-full items-center justify-center space-x-5">
+        {musicbrainzId && (
+          <a
+            href={`https://musicbrainz.org/artist/${musicbrainzId}`}
+            className="text-xs font-medium text-gray-400 opacity-50 transition duration-300 hover:opacity-100"
+            target="_blank"
+            rel="noreferrer"
+            title="MusicBrainz"
+          >
+            MB
+          </a>
+        )}
+        {spotifyLink && (
+          <a
+            href={spotifyLink.url}
+            className="text-xs font-medium text-gray-400 opacity-50 transition duration-300 hover:opacity-100"
+            target="_blank"
+            rel="noreferrer"
+            title="Spotify"
+          >
+            Spotify
+          </a>
+        )}
+        {appleMusicLink && (
+          <a
+            href={appleMusicLink.url}
+            className="text-xs font-medium text-gray-400 opacity-50 transition duration-300 hover:opacity-100"
+            target="_blank"
+            rel="noreferrer"
+            title="Apple Music"
+          >
+            Apple
+          </a>
+        )}
+        {lastfmLink && (
+          <a
+            href={lastfmLink.url}
+            className="text-xs font-medium text-gray-400 opacity-50 transition duration-300 hover:opacity-100"
+            target="_blank"
+            rel="noreferrer"
+            title="Last.fm"
+          >
+            Last.fm
+          </a>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full items-center justify-center space-x-5">

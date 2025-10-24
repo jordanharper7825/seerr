@@ -21,6 +21,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import Artist from './Artist';
 import Issue from './Issue';
 import { MediaRequest } from './MediaRequest';
 import Season from './Season';
@@ -88,9 +89,9 @@ class Media {
   @Column({ type: 'varchar' })
   public mediaType: MediaType;
 
-  @Column()
+  @Column({ nullable: true })
   @Index()
-  public tmdbId: number;
+  public tmdbId?: number;
 
   @Column({ unique: true, nullable: true })
   @Index()
@@ -99,6 +100,13 @@ class Media {
   @Column({ nullable: true })
   @Index()
   public imdbId?: string;
+
+  @Column({ nullable: true, type: 'varchar', length: 36 })
+  @Index()
+  public musicbrainzId?: string; // MusicBrainz Artist ID for music
+
+  @Column({ nullable: true })
+  public artistName?: string; // Artist name for music
 
   @Column({ type: 'int', default: MediaStatus.UNKNOWN })
   public status: MediaStatus;
@@ -122,6 +130,12 @@ class Media {
 
   @OneToMany(() => Issue, (issue) => issue.media, { cascade: true })
   public issues: Issue[];
+
+  @OneToMany(() => Artist, (artist) => artist.media, {
+    cascade: true,
+    eager: true,
+  })
+  public artist: Artist[]; // For music media type
 
   @OneToOne(() => Blacklist, (blacklist) => blacklist.media)
   public blacklist: Promise<Blacklist>;

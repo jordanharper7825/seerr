@@ -95,6 +95,13 @@ export interface SonarrSettings extends DVRSettings {
   enableSeasonFolders: boolean;
 }
 
+export interface LidarrSettings extends DVRSettings {
+  metadataProfileId: number;
+  metadataProfileName: string;
+  monitorNewItems: 'all' | 'none' | 'new';
+  albumFolder: boolean;
+}
+
 interface Quota {
   quotaLimit?: number;
   quotaDays?: number;
@@ -130,6 +137,7 @@ export interface MainSettings {
   defaultQuotas: {
     movie: Quota;
     tv: Quota;
+    music: Quota;
   };
   hideAvailable: boolean;
   hideBlacklisted: boolean;
@@ -146,6 +154,7 @@ export interface MainSettings {
   enableSpecialEpisodes: boolean;
   locale: string;
   youtubeUrl: string;
+  lastfmApiKey?: string;
 }
 
 export interface ProxySettings {
@@ -358,6 +367,7 @@ export interface AllSettings {
   tautulli: TautulliSettings;
   radarr: RadarrSettings[];
   sonarr: SonarrSettings[];
+  lidarr: LidarrSettings[];
   public: PublicSettings;
   notifications: NotificationSettings;
   jobs: Record<JobId, JobSettings>;

@@ -26,6 +26,7 @@ import {
   PrimaryGeneratedColumn,
   RelationCount,
 } from 'typeorm';
+import { AlbumRequest } from './AlbumRequest';
 import Media from './Media';
 import SeasonRequest from './SeasonRequest';
 import { User } from './User';
@@ -556,6 +557,12 @@ export class MediaRequest {
     cascade: true,
   })
   public seasons: SeasonRequest[];
+
+  @OneToMany(() => AlbumRequest, (album) => album.request, {
+    eager: true,
+    cascade: true,
+  })
+  public albumRequests: AlbumRequest[];
 
   @Column({ default: false })
   public is4k: boolean;
