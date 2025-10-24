@@ -26,6 +26,8 @@ RUN \
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile
 
+RUN npm install -g pnpm
+
 RUN pnpm build
 
 RUN rm -rf .next/cache
