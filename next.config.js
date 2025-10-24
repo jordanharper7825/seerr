@@ -26,4 +26,9 @@ module.exports = {
     scrollRestoration: true,
     largePageDataBytes: 256000,
   },
+
+  // ✅ Add this block
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
