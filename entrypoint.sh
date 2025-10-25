@@ -22,14 +22,17 @@ User GID:    $PGID
 "
 
 # Check if node user needs to be modified
-CURRENT_UID=$(id -u node)
-CURRENT_GID=$(id -g node)
+CURRENT_UID=$(id -u node 2>/dev/null || echo "0")
+CURRENT_GID=$(id -g node 2>/dev/null || echo "0")
 
 if [ "$PUID" != "$CURRENT_UID" ] || [ "$PGID" != "$CURRENT_GID" ]; then
     echo "Updating node user to UID:$PUID GID:$PGID..."
 
-    # Change node user's UID and GID
+    # Remove existing node user/group if they exist
     deluser node 2>/dev/null || true
+    delgroup node 2>/dev/null || true
+
+    # Create group and user with specified IDs
     addgroup -g "$PGID" node 2>/dev/null || true
     adduser -D -H -u "$PUID" -G node -s /bin/sh node 2>/dev/null || true
 
