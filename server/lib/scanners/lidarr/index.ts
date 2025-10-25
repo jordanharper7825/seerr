@@ -11,7 +11,6 @@ import type {
 import BaseScanner from '@server/lib/scanners/baseScanner';
 import type { LidarrSettings } from '@server/lib/settings';
 import { getSettings } from '@server/lib/settings';
-import logger from '@server/logger';
 import { uniqWith } from 'lodash';
 
 type SyncStatus = StatusBase & {
@@ -84,7 +83,10 @@ class LidarrScanner
   }
 
   private async processLidarrArtist(lidarrArtist: LidarrArtist): Promise<void> {
-    if (!lidarrArtist.monitored && lidarrArtist.statistics.trackFileCount === 0) {
+    if (
+      !lidarrArtist.monitored &&
+      lidarrArtist.statistics.trackFileCount === 0
+    ) {
       this.log(
         'Artist is unmonitored and has no tracks. Skipping item.',
         'debug',
@@ -124,7 +126,7 @@ class LidarrScanner
       media.mediaType = MediaType.MUSIC;
       media.musicbrainzId = lidarrArtist.foreignArtistId;
       media.artistName = lidarrArtist.artistName;
-      media.tmdbId = null;
+      media.tmdbId = undefined;
     }
 
     // Determine availability status
@@ -170,9 +172,9 @@ class LidarrScanner
     artist.lidarrServerId = this.currentServer.id;
     artist.biography = lidarrArtist.overview;
     artist.genres = lidarrArtist.genres;
-    artist.poster =
-      lidarrArtist.images.find((i) => i.coverType === 'poster')?.remoteUrl ||
-      null;
+    artist.poster = lidarrArtist.images.find(
+      (i) => i.coverType === 'poster'
+    )?.remoteUrl;
 
     await artistRepository.save(artist);
 

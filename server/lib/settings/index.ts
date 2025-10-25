@@ -36,6 +36,12 @@ export type JobId =
   | 'image-cache-cleanup'
   | 'process-blacklisted-tags';
 
+export interface JobSettings {
+  schedule: string;
+}
+
+export type JobsSettings = Partial<Record<JobId, JobSettings>>;
+
 /* --------------------------------------------------------
  * NOTIFICATION AGENTS
  * ------------------------------------------------------*/
@@ -77,6 +83,65 @@ export interface NotificationAgentNtfy extends NotificationAgentConfig {
   };
 }
 
+export interface NotificationAgentDiscord extends NotificationAgentConfig {
+  options: {
+    webhookUrl: string;
+    botUsername?: string;
+    botAvatarUrl?: string;
+    enableMentions?: boolean;
+    webhookRoleId?: string;
+  };
+}
+
+export interface NotificationAgentGotify extends NotificationAgentConfig {
+  options: {
+    url: string;
+    token: string;
+    priority?: number;
+  };
+}
+
+export interface NotificationAgentPushbullet extends NotificationAgentConfig {
+  options: {
+    accessToken: string;
+    channelTag?: string;
+  };
+}
+
+export interface NotificationAgentPushover extends NotificationAgentConfig {
+  options: {
+    userToken: string;
+    appToken: string;
+    accessToken?: string;
+    sound?: string;
+  };
+}
+
+export interface NotificationAgentSlack extends NotificationAgentConfig {
+  options: {
+    webhookUrl: string;
+  };
+}
+
+export interface NotificationAgentTelegram extends NotificationAgentConfig {
+  options: {
+    botAPI: string;
+    chatId: string;
+    sendSilently?: boolean;
+    botUsername?: string;
+    messageThreadId?: string;
+  };
+}
+
+export interface NotificationAgentWebhook extends NotificationAgentConfig {
+  options: {
+    webhookUrl: string;
+    authHeader?: string;
+    jsonPayload?: string;
+    supportVariables?: boolean;
+  };
+}
+
 export enum NotificationAgentKey {
   DISCORD = 'discord',
   EMAIL = 'email',
@@ -90,10 +155,19 @@ export enum NotificationAgentKey {
   WEBPUSH = 'webpush',
 }
 
-/** Notification settings wrapper — email is strongly typed */
+/** Notification settings wrapper — all agents are strongly typed */
 export interface NotificationSettings {
-  agents: Record<NotificationAgentKey, NotificationAgentConfig> & {
+  agents: {
+    discord: NotificationAgentDiscord;
     email: NotificationAgentEmail;
+    gotify: NotificationAgentGotify;
+    ntfy: NotificationAgentNtfy;
+    pushbullet: NotificationAgentPushbullet;
+    pushover: NotificationAgentPushover;
+    slack: NotificationAgentSlack;
+    telegram: NotificationAgentTelegram;
+    webhook: NotificationAgentWebhook;
+    webpush: NotificationAgentConfig;
   };
 }
 
@@ -252,6 +326,27 @@ interface PublicSettings {
   initialized: boolean;
 }
 
+export interface FullPublicSettings extends PublicSettings {
+  main: MainSettings;
+  plex: {
+    name: string;
+    machineId?: string;
+    ip: string;
+    port: number;
+    useSsl?: boolean;
+    webAppUrl?: string;
+  };
+  jellyfin: {
+    name: string;
+    ip: string;
+    port: number;
+    useSsl?: boolean;
+    urlBase?: string;
+    externalHostname?: string;
+    jellyfinForgotPasswordUrl?: string;
+  };
+}
+
 export interface AllSettings {
   clientId: string;
   vapidPublic: string;
@@ -283,12 +378,14 @@ class Settings {
   private data: AllSettings;
 
   constructor(initialSettings?: AllSettings) {
-    const blankAgent = (): NotificationAgentConfig => ({
+    const defaultDiscord: NotificationAgentDiscord = {
       enabled: false,
       embedPoster: true,
       types: 0,
-      options: {},
-    });
+      options: {
+        webhookUrl: '',
+      },
+    };
 
     const defaultEmail: NotificationAgentEmail = {
       enabled: false,
@@ -305,6 +402,80 @@ class Settings {
         allowSelfSigned: false,
         senderName: 'Seerr',
       },
+    };
+
+    const defaultGotify: NotificationAgentGotify = {
+      enabled: false,
+      embedPoster: true,
+      types: 0,
+      options: {
+        url: '',
+        token: '',
+      },
+    };
+
+    const defaultNtfy: NotificationAgentNtfy = {
+      enabled: false,
+      embedPoster: true,
+      types: 0,
+      options: {
+        url: '',
+        topic: '',
+      },
+    };
+
+    const defaultPushbullet: NotificationAgentPushbullet = {
+      enabled: false,
+      embedPoster: true,
+      types: 0,
+      options: {
+        accessToken: '',
+      },
+    };
+
+    const defaultPushover: NotificationAgentPushover = {
+      enabled: false,
+      embedPoster: true,
+      types: 0,
+      options: {
+        userToken: '',
+        appToken: '',
+      },
+    };
+
+    const defaultSlack: NotificationAgentSlack = {
+      enabled: false,
+      embedPoster: true,
+      types: 0,
+      options: {
+        webhookUrl: '',
+      },
+    };
+
+    const defaultTelegram: NotificationAgentTelegram = {
+      enabled: false,
+      embedPoster: true,
+      types: 0,
+      options: {
+        botAPI: '',
+        chatId: '',
+      },
+    };
+
+    const defaultWebhook: NotificationAgentWebhook = {
+      enabled: false,
+      embedPoster: true,
+      types: 0,
+      options: {
+        webhookUrl: '',
+      },
+    };
+
+    const defaultWebpush: NotificationAgentConfig = {
+      enabled: false,
+      embedPoster: true,
+      types: 0,
+      options: {},
     };
 
     this.data = {
@@ -358,15 +529,15 @@ class Settings {
       public: { initialized: false },
       notifications: {
         agents: {
-          discord: blankAgent(),
-          gotify: blankAgent(),
-          ntfy: blankAgent(),
-          pushbullet: blankAgent(),
-          pushover: blankAgent(),
-          slack: blankAgent(),
-          telegram: blankAgent(),
-          webhook: blankAgent(),
-          webpush: blankAgent(),
+          discord: defaultDiscord,
+          gotify: defaultGotify,
+          ntfy: defaultNtfy,
+          pushbullet: defaultPushbullet,
+          pushover: defaultPushover,
+          slack: defaultSlack,
+          telegram: defaultTelegram,
+          webhook: defaultWebhook,
+          webpush: defaultWebpush,
           email: defaultEmail,
         },
       },
@@ -444,6 +615,82 @@ class Settings {
   }
   get network(): NetworkSettings {
     return this.data.network;
+  }
+  get metadataSettings(): MetadataSettings {
+    return this.data.metadataSettings;
+  }
+  get jobs(): JobsSettings {
+    return this.data.jobs;
+  }
+  get public(): { initialized: boolean } {
+    return this.data.public;
+  }
+  get vapidPublic(): string {
+    return this.data.vapidPublic;
+  }
+  get vapidPrivate(): string {
+    return this.data.vapidPrivate;
+  }
+  get fullPublicSettings(): FullPublicSettings {
+    return {
+      ...this.data.public,
+      main: this.data.main,
+      plex: {
+        name: this.data.plex.name,
+        machineId: this.data.plex.machineId,
+        ip: this.data.plex.ip,
+        port: this.data.plex.port,
+        useSsl: this.data.plex.useSsl,
+        webAppUrl: this.data.plex.webAppUrl,
+      },
+      jellyfin: {
+        name: this.data.jellyfin.name,
+        ip: this.data.jellyfin.ip,
+        port: this.data.jellyfin.port,
+        useSsl: this.data.jellyfin.useSsl,
+        urlBase: this.data.jellyfin.urlBase,
+        externalHostname: this.data.jellyfin.externalHostname,
+        jellyfinForgotPasswordUrl: this.data.jellyfin.jellyfinForgotPasswordUrl,
+      },
+    };
+  }
+  async regenerateApiKey(): Promise<MainSettings> {
+    const randomAPIkey = randomUUID();
+    this.data.main.apiKey = randomAPIkey;
+    return this.data.main;
+  }
+
+  // Setter methods for mutable settings
+  setMain(data: Partial<MainSettings>): void {
+    this.data.main = { ...this.data.main, ...data };
+  }
+
+  setNetwork(data: Partial<NetworkSettings>): void {
+    this.data.network = { ...this.data.network, ...data };
+  }
+
+  setRadarr(data: RadarrSettings[]): void {
+    this.data.radarr = data;
+  }
+
+  setSonarr(data: SonarrSettings[]): void {
+    this.data.sonarr = data;
+  }
+
+  setLidarr(data: LidarrSettings[]): void {
+    this.data.lidarr = data;
+  }
+
+  setMetadataSettings(data: MetadataSettings): void {
+    this.data.metadataSettings = data;
+  }
+
+  setJobSchedule(jobId: JobId, schedule: string): void {
+    if (!this.data.jobs[jobId]) {
+      this.data.jobs[jobId] = { schedule };
+    } else {
+      this.data.jobs[jobId].schedule = schedule;
+    }
   }
 }
 

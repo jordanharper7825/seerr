@@ -30,7 +30,7 @@ radarrRoutes.post('/', async (req, res) => {
       });
   }
 
-  settings.radarr = [...settings.radarr, newRadarr];
+  settings.setRadarr([...settings.radarr, newRadarr]);
   await settings.save();
 
   return res.status(201).json(newRadarr);

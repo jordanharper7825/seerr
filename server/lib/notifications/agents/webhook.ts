@@ -138,10 +138,12 @@ class WebhookAgent
   }
 
   private buildPayload(type: Notification, payload: NotificationPayload) {
-    const payloadString = Buffer.from(
-      this.getSettings().options.jsonPayload,
-      'base64'
-    ).toString('utf8');
+    const jsonPayload = this.getSettings().options.jsonPayload;
+    if (!jsonPayload) {
+      throw new Error('JSON payload is not configured');
+    }
+
+    const payloadString = Buffer.from(jsonPayload, 'base64').toString('utf8');
 
     const parsedJSON = JSON.parse(JSON.parse(payloadString));
 

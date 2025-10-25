@@ -30,7 +30,7 @@ sonarrRoutes.post('/', async (req, res) => {
       });
   }
 
-  settings.sonarr = [...settings.sonarr, newSonarr];
+  settings.setSonarr([...settings.sonarr, newSonarr]);
   await settings.save();
 
   return res.status(201).json(newSonarr);

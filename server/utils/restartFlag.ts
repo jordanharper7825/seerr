@@ -1,10 +1,11 @@
-import type { AllSettings, NetworkSettings } from '@server/lib/settings';
+import type Settings from '@server/lib/settings';
+import type { NetworkSettings } from '@server/lib/settings';
 import { getSettings } from '@server/lib/settings';
 
 class RestartFlag {
   private networkSettings: NetworkSettings;
 
-  public initializeSettings(settings: AllSettings): void {
+  public initializeSettings(settings: Settings): void {
     this.networkSettings = {
       ...settings.network,
       proxy: { ...settings.network.proxy },

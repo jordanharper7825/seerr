@@ -1,23 +1,16 @@
-import Button from '@app/components/Common/Button';
 import CachedImage from '@app/components/Common/CachedImage';
 import LoadingSpinner from '@app/components/Common/LoadingSpinner';
 import PageTitle from '@app/components/Common/PageTitle';
 import Tag from '@app/components/Common/Tag';
-import Tooltip from '@app/components/Common/Tooltip';
 import ExternalLinkBlock from '@app/components/ExternalLinkBlock';
 import RequestButton from '@app/components/RequestButton';
 import StatusBadge from '@app/components/StatusBadge';
 import type { MusicAlbum, MusicArtist } from '@app/hooks/useMusic';
-import { Permission, useUser } from '@app/hooks/useUser';
 import ErrorPage from '@app/pages/_error';
 import defineMessages from '@app/utils/defineMessages';
-import {
-  CogIcon,
-  MusicalNoteIcon,
-  StarIcon,
-} from '@heroicons/react/24/outline';
+import { MusicalNoteIcon, StarIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
-import { MediaStatus, MediaType } from '@server/constants/media';
+import { MediaType } from '@server/constants/media';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -130,7 +123,6 @@ const AlbumList = ({ albums, title }: AlbumListProps) => {
 };
 
 const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
-  const { hasPermission } = useUser();
   const router = useRouter();
   const intl = useIntl();
 
@@ -253,19 +245,6 @@ const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
             tmdbId={artistData.id as any}
             onUpdate={() => revalidate()}
           />
-          {hasPermission(Permission.MANAGE_REQUESTS) &&
-            artistData.mediaInfo &&
-            artistData.mediaInfo.status !== MediaStatus.UNKNOWN && (
-              <Tooltip content={intl.formatMessage(messages.manageArtist)}>
-                <Button
-                  buttonType="ghost"
-                  onClick={() => setShowManager(true)}
-                  className="relative ml-2 first:ml-0"
-                >
-                  <CogIcon className="!mr-0" />
-                </Button>
-              </Tooltip>
-            )}
         </div>
       </div>
       <div className="media-overview">

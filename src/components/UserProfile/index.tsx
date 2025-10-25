@@ -396,7 +396,7 @@ const UserProfile = () => {
               isLoading={!watchData}
               items={watchData?.recentlyWatched
                 ?.filter(
-                  (item) =>
+                  (item): item is typeof item & { tmdbId: number } =>
                     (item.mediaType === 'movie' || item.mediaType === 'tv') &&
                     item.tmdbId !== undefined
                 )

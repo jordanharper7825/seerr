@@ -1,10 +1,10 @@
-import { Router } from 'express';
-import { getSettings } from '@server/lib/settings';
-import LidarrAPI from '@server/api/servarr/lidarr';
 import ServarrBase from '@server/api/servarr/base';
-import { isAuthenticated } from '@server/middleware/auth';
+import LidarrAPI from '@server/api/servarr/lidarr';
 import { Permission } from '@server/lib/permissions';
+import { getSettings } from '@server/lib/settings';
 import logger from '@server/logger';
+import { isAuthenticated } from '@server/middleware/auth';
+import { Router } from 'express';
 
 const lidarrRoutes = Router();
 
@@ -12,14 +12,10 @@ const lidarrRoutes = Router();
  * GET /api/v1/settings/lidarr
  * Get all Lidarr instances
  */
-lidarrRoutes.get(
-  '/',
-  isAuthenticated(Permission.ADMIN),
-  async (req, res) => {
-    const settings = getSettings();
-    return res.status(200).json(settings.lidarr || []);
-  }
-);
+lidarrRoutes.get('/', isAuthenticated(Permission.ADMIN), async (req, res) => {
+  const settings = getSettings();
+  return res.status(200).json(settings.lidarr || []);
+});
 
 /**
  * POST /api/v1/settings/lidarr
@@ -34,7 +30,7 @@ lidarrRoutes.post(
       const { id } = req.body;
 
       if (!settings.lidarr) {
-        settings.lidarr = [];
+        settings.setLidarr([]);
       }
 
       // If ID exists, update; otherwise create

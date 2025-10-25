@@ -78,7 +78,7 @@ settingsRoutes.get('/main', (req, res, next) => {
 settingsRoutes.post('/main', async (req, res) => {
   const settings = getSettings();
 
-  settings.main = merge(settings.main, req.body);
+  settings.setMain(merge(settings.main, req.body));
   await settings.save();
 
   return res.status(200).json(settings.main);
@@ -93,7 +93,7 @@ settingsRoutes.get('/network', (req, res) => {
 settingsRoutes.post('/network', async (req, res) => {
   const settings = getSettings();
 
-  settings.network = merge(settings.network, req.body);
+  settings.setNetwork(merge(settings.network, req.body));
   await settings.save();
 
   return res.status(200).json(settings.network);
@@ -729,7 +729,7 @@ settingsRoutes.post<{ jobId: JobId }>(
     const settings = getSettings();
 
     if (result) {
-      settings.jobs[scheduledJob.id].schedule = req.body.schedule;
+      settings.setJobSchedule(scheduledJob.id, req.body.schedule);
       await settings.save();
 
       scheduledJob.cronSchedule = req.body.schedule;

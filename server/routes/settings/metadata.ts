@@ -76,10 +76,10 @@ metadataRoutes.put('/', async (req, res) => {
     });
   }
 
-  settings.metadataSettings = {
+  settings.setMetadataSettings({
     tv: body.tv,
     anime: body.anime,
-  };
+  });
   await settings.save();
 
   res.status(200).json({
