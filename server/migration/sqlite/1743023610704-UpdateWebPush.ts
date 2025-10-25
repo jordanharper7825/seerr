@@ -24,7 +24,12 @@ export class UpdateWebPush1743023610704 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "temporary_user_push_subscription" RENAME TO "user_push_subscription"`
     );
-    await queryRunner.query(`DROP INDEX "IDX_6bbafa28411e6046421991ea21"`);
+    // Only drop index if it exists (for existing databases)
+    try {
+      await queryRunner.query(`DROP INDEX "IDX_6bbafa28411e6046421991ea21"`);
+    } catch (e) {
+      // Index doesn't exist on fresh databases, ignore
+    }
     await queryRunner.query(
       `CREATE TABLE "temporary_blacklist" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "mediaType" varchar NOT NULL, "title" varchar, "tmdbId" integer NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "userId" integer, "mediaId" integer)`
     );
@@ -38,7 +43,12 @@ export class UpdateWebPush1743023610704 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_6bbafa28411e6046421991ea21" ON "blacklist" ("tmdbId") `
     );
-    await queryRunner.query(`DROP INDEX "IDX_6bbafa28411e6046421991ea21"`);
+    // Only drop index if it exists
+    try {
+      await queryRunner.query(`DROP INDEX "IDX_6bbafa28411e6046421991ea21"`);
+    } catch (e) {
+      // Index doesn't exist on fresh databases, ignore
+    }
     await queryRunner.query(
       `CREATE TABLE "temporary_blacklist" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "mediaType" varchar NOT NULL, "title" varchar, "tmdbId" integer NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "userId" integer, "mediaId" integer, CONSTRAINT "UQ_5f933c8ed6ad2c31739e6b94886" UNIQUE ("tmdbId"), CONSTRAINT "UQ_e49b27917899e01d7aca6b0b15c" UNIQUE ("mediaId"))`
     );
@@ -52,9 +62,22 @@ export class UpdateWebPush1743023610704 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_6bbafa28411e6046421991ea21" ON "blacklist" ("tmdbId") `
     );
-    await queryRunner.query(`DROP INDEX "IDX_7ff2d11f6a83cb52386eaebe74"`);
-    await queryRunner.query(`DROP INDEX "IDX_41a289eb1fa489c1bc6f38d9c3"`);
-    await queryRunner.query(`DROP INDEX "IDX_7157aad07c73f6a6ae3bbd5ef5"`);
+    // Only drop indexes if they exist (for existing databases)
+    try {
+      await queryRunner.query(`DROP INDEX "IDX_7ff2d11f6a83cb52386eaebe74"`);
+    } catch (e) {
+      // Index doesn't exist, ignore
+    }
+    try {
+      await queryRunner.query(`DROP INDEX "IDX_41a289eb1fa489c1bc6f38d9c3"`);
+    } catch (e) {
+      // Index doesn't exist, ignore
+    }
+    try {
+      await queryRunner.query(`DROP INDEX "IDX_7157aad07c73f6a6ae3bbd5ef5"`);
+    } catch (e) {
+      // Index doesn't exist, ignore
+    }
     await queryRunner.query(
       `CREATE TABLE "temporary_media" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "mediaType" varchar NOT NULL, "tmdbId" integer NOT NULL, "tvdbId" integer, "imdbId" varchar, "status" integer NOT NULL DEFAULT (1), "status4k" integer NOT NULL DEFAULT (1), "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "lastSeasonChange" datetime NOT NULL DEFAULT (CURRENT_TIMESTAMP), "mediaAddedAt" datetime DEFAULT (CURRENT_TIMESTAMP), "serviceId" integer, "serviceId4k" integer, "externalServiceId" integer, "externalServiceId4k" integer, "externalServiceSlug" varchar, "externalServiceSlug4k" varchar, "ratingKey" varchar, "ratingKey4k" varchar, "jellyfinMediaId" varchar, "jellyfinMediaId4k" varchar, CONSTRAINT "UQ_41a289eb1fa489c1bc6f38d9c3c" UNIQUE ("tvdbId"))`
     );
@@ -72,7 +95,12 @@ export class UpdateWebPush1743023610704 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_7157aad07c73f6a6ae3bbd5ef5" ON "media" ("tmdbId") `
     );
-    await queryRunner.query(`DROP INDEX "IDX_939f205946256cc0d2a1ac51a8"`);
+    // Only drop index if it exists (for existing databases)
+    try {
+      await queryRunner.query(`DROP INDEX "IDX_939f205946256cc0d2a1ac51a8"`);
+    } catch (e) {
+      // Index doesn't exist on fresh databases, ignore
+    }
     await queryRunner.query(
       `CREATE TABLE "temporary_watchlist" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "ratingKey" varchar NOT NULL, "mediaType" varchar NOT NULL, "title" varchar NOT NULL, "tmdbId" integer NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "requestedById" integer, "mediaId" integer, CONSTRAINT "UNIQUE_USER_DB" UNIQUE ("tmdbId", "requestedById"), CONSTRAINT "FK_ae34e6b153a90672eb9dc4857d7" FOREIGN KEY ("requestedById") REFERENCES "user" ("id") ON DELETE CASCADE ON UPDATE NO ACTION, CONSTRAINT "FK_6641da8d831b93dfcb429f8b8bc" FOREIGN KEY ("mediaId") REFERENCES "media" ("id") ON DELETE CASCADE ON UPDATE NO ACTION)`
     );
@@ -86,7 +114,12 @@ export class UpdateWebPush1743023610704 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_939f205946256cc0d2a1ac51a8" ON "watchlist" ("tmdbId") `
     );
-    await queryRunner.query(`DROP INDEX "IDX_6bbafa28411e6046421991ea21"`);
+    // Only drop index if it exists
+    try {
+      await queryRunner.query(`DROP INDEX "IDX_6bbafa28411e6046421991ea21"`);
+    } catch (e) {
+      // Index doesn't exist, ignore
+    }
     await queryRunner.query(
       `CREATE TABLE "temporary_blacklist" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "mediaType" varchar NOT NULL, "title" varchar, "tmdbId" integer NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "userId" integer, "mediaId" integer, CONSTRAINT "UQ_5f933c8ed6ad2c31739e6b94886" UNIQUE ("tmdbId"), CONSTRAINT "UQ_e49b27917899e01d7aca6b0b15c" UNIQUE ("mediaId"), CONSTRAINT "FK_53c1ab62c3e5875bc3ac474823e" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION, CONSTRAINT "FK_62b7ade94540f9f8d8bede54b99" FOREIGN KEY ("mediaId") REFERENCES "media" ("id") ON DELETE CASCADE ON UPDATE NO ACTION)`
     );
@@ -117,7 +150,12 @@ export class UpdateWebPush1743023610704 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_6bbafa28411e6046421991ea21" ON "blacklist" ("tmdbId") `
     );
-    await queryRunner.query(`DROP INDEX "IDX_939f205946256cc0d2a1ac51a8"`);
+    // Only drop index if it exists
+    try {
+      await queryRunner.query(`DROP INDEX "IDX_939f205946256cc0d2a1ac51a8"`);
+    } catch (e) {
+      // Index doesn't exist, ignore
+    }
     await queryRunner.query(
       `ALTER TABLE "watchlist" RENAME TO "temporary_watchlist"`
     );
