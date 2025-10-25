@@ -36,9 +36,7 @@ ARG COMMIT_TAG
 ENV NODE_ENV=production
 ENV COMMIT_TAG=${COMMIT_TAG}
 
-RUN apk add --no-cache tzdata
-
-USER node:node
+RUN apk add --no-cache tzdata su-exec shadow
 
 WORKDIR /app
 
@@ -48,8 +46,10 @@ COPY --chown=node:node --from=build /app/.next ./.next
 COPY --chown=node:node --from=build /app/dist ./dist
 
 RUN touch config/DOCKER && \
-  echo "{\"commitTag\": \"${COMMIT_TAG}\"}" > committag.json
+  echo "{\"commitTag\": \"${COMMIT_TAG}\"}" > committag.json && \
+  chmod +x /app/entrypoint.sh
 
 EXPOSE 5055
 
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD [ "npm", "start" ]
