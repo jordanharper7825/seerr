@@ -39,7 +39,14 @@ fi
 # Ensure config directory exists and has correct permissions
 echo "Setting permissions on /app/config..."
 mkdir -p /app/config/logs
-chown -R node:node /app/config
+
+# Try to set permissions, but don't fail if some files can't be changed
+# (this can happen with existing files from host mounts)
+chown -R node:node /app/config 2>/dev/null || true
+
+# Ensure at minimum the directories are accessible
+chown node:node /app/config 2>/dev/null || true
+chmod 755 /app/config 2>/dev/null || true
 
 # Run the application as the node user
 echo "Starting Seerr..."
