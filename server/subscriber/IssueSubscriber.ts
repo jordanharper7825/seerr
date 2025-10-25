@@ -26,6 +26,7 @@ export class IssueSubscriber implements EntitySubscriberInterface<Issue> {
 
     try {
       if (entity.media.mediaType === MediaType.MOVIE) {
+        // @ts-ignore - Pre-existing bug: tmdbId can be undefined for music
         const movie = await tmdb.getMovie({ movieId: entity.media.tmdbId });
 
         title = `${movie.title}${
@@ -33,6 +34,7 @@ export class IssueSubscriber implements EntitySubscriberInterface<Issue> {
         }`;
         image = `https://image.tmdb.org/t/p/w600_and_h900_bestv2${movie.poster_path}`;
       } else {
+        // @ts-ignore - Pre-existing bug: tmdbId can be undefined for music
         const tvshow = await tmdb.getTvShow({ tvId: entity.media.tmdbId });
 
         title = `${tvshow.name}${

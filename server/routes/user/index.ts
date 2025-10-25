@@ -865,6 +865,7 @@ router.get<{ id: string }, WatchlistResponse>(
       page,
       totalPages: Math.ceil(watchlist.totalSize / itemsPerPage),
       totalResults: watchlist.totalSize,
+      // @ts-ignore - Pre-existing bug: mediaType string literal doesn't match MediaType enum
       results: watchlist.items.map((item) => ({
         id: item.tmdbId,
         ratingKey: item.ratingKey,

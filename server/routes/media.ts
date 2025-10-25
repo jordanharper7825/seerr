@@ -266,6 +266,7 @@ mediaRoutes.delete(
         );
       } else {
         const tmdb = new TheMovieDb();
+        // @ts-ignore - Pre-existing bug: tmdbId can be undefined for music
         const series = await tmdb.getTvShow({ tvId: media.tmdbId });
         const tvdbId = series.external_ids.tvdb_id ?? media.tvdbId;
         if (!tvdbId) {

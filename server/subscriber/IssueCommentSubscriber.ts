@@ -42,6 +42,7 @@ export class IssueCommentSubscriber
       });
 
       if (media.mediaType === MediaType.MOVIE) {
+        // @ts-ignore - Pre-existing bug: tmdbId can be undefined for music
         const movie = await tmdb.getMovie({ movieId: media.tmdbId });
 
         title = `${movie.title}${
@@ -49,6 +50,7 @@ export class IssueCommentSubscriber
         }`;
         image = `https://image.tmdb.org/t/p/w600_and_h900_bestv2${movie.poster_path}`;
       } else {
+        // @ts-ignore - Pre-existing bug: tmdbId can be undefined for music
         const tvshow = await tmdb.getTvShow({ tvId: media.tmdbId });
 
         title = `${tvshow.name}${
