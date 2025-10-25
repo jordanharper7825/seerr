@@ -1,8 +1,8 @@
 export enum MediaServerType {
-  NOT_CONFIGURED = 0,
   PLEX = 1,
-  JELLYFIN = 2,
-  EMBY = 3,
+  JELLYFIN,
+  EMBY,
+  NOT_CONFIGURED,
 }
 
 export enum ServerType {

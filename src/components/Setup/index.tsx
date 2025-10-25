@@ -109,17 +109,6 @@ const Setup = () => {
   });
 
   useEffect(() => {
-    console.log(
-      'Setup useEffect - currentStep:',
-      currentStep,
-      'mediaServerType:',
-      mediaServerType,
-      'settings.mediaServerType:',
-      settings.currentSettings.mediaServerType,
-      'user:',
-      !!user
-    );
-
     if (settings.currentSettings.initialized) {
       router.push('/');
     }
@@ -241,9 +230,6 @@ const Setup = () => {
                   <div className="px-2 pt-2">
                     <button
                       onClick={() => {
-                        console.log(
-                          'Plex button clicked - setting mediaServerType to PLEX and currentStep to 2'
-                        );
                         setMediaServerType(MediaServerType.PLEX);
                         setCurrentStep(2);
                       }}
