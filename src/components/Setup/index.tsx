@@ -12,6 +12,7 @@ import SettingsServices from '@app/components/Settings/SettingsServices';
 import SetupSteps from '@app/components/Setup/SetupSteps';
 import useLocale from '@app/hooks/useLocale';
 import useSettings from '@app/hooks/useSettings';
+import { useUser } from '@app/hooks/useUser';
 import defineMessages from '@app/utils/defineMessages';
 import { MediaServerType } from '@server/constants/server';
 import type { Library } from '@server/lib/settings';
@@ -55,6 +56,7 @@ const Setup = () => {
   const { locale } = useLocale();
   const settings = useSettings();
   const toasts = useToasts();
+  const { user } = useUser();
 
   const finishSetup = async () => {
     setIsUpdating(true);
@@ -116,7 +118,8 @@ const Setup = () => {
       MediaServerType.NOT_CONFIGURED
     ) {
       setMediaServerType(settings.currentSettings.mediaServerType);
-      if (currentStep < 3) {
+      // Only skip to step 3 if user is authenticated
+      if (user && currentStep < 3) {
         setCurrentStep(3);
       }
     }
@@ -129,6 +132,7 @@ const Setup = () => {
     currentStep,
     mediaServerType,
     validateLibraries,
+    user,
   ]);
 
   useEffect(() => {
