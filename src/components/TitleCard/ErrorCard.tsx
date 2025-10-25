@@ -5,12 +5,14 @@ import { CheckIcon, TrashIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
+import type { MediaType } from '@server/constants/media';
 
 interface ErrorCardProps {
   id: number;
   tmdbId: number;
   tvdbId?: number;
-  type: 'movie' | 'tv';
+  // accept enum (so callers passing MediaType work)
+  type: MediaType;
   canExpand?: boolean;
 }
 

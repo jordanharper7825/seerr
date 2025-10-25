@@ -1,6 +1,5 @@
 import globalMessages from '@app/i18n/globalMessages';
 import defineMessages from '@app/utils/defineMessages';
-import type { Language } from '@server/lib/settings';
 import { sortBy } from 'lodash';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -12,6 +11,13 @@ const messages = defineMessages('components.LanguageSelector', {
   originalLanguageDefault: 'All Languages',
   languageServerDefault: 'Default ({language})',
 });
+
+// Local copy of the server's Language shape
+type Language = {
+  iso_639_1: string;
+  english_name: string;
+  name: string;
+};
 
 type OptionType = {
   value: string;

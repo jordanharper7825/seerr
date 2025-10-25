@@ -2,7 +2,8 @@ import useSettings from '@app/hooks/useSettings';
 import defineMessages from '@app/utils/defineMessages';
 import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
-import type { Region } from '@server/lib/settings';
+// NOTE: Do NOT import Region from @server/lib/settings; define a local type instead
+type Region = { iso_3166_1: string; english_name: string; name?: string };
 import { countries } from 'country-flag-icons';
 import 'country-flag-icons/3x2/flags.css';
 import { sortBy } from 'lodash';
@@ -45,6 +46,7 @@ const RegionSelector = ({
     () => ({
       iso_3166_1: 'all',
       english_name: 'All',
+      name: 'All',
     }),
     []
   );
@@ -71,27 +73,30 @@ const RegionSelector = ({
       : currentSettings.streamingRegion;
 
   useEffect(() => {
-    if (regions && value) {
+    if (regions) {
+      if (!value) {
+        setSelectedRegion(null);
+        return;
+      }
       if (value === 'all') {
         setSelectedRegion(allRegion);
       } else {
-        const matchedRegion = regions.find(
-          (region) => region.iso_3166_1 === value
-        );
-        setSelectedRegion(matchedRegion ?? null);
+        const matchedRegion =
+          regions.find((region) => region.iso_3166_1 === value) ?? null;
+        setSelectedRegion(matchedRegion);
       }
     }
   }, [value, regions, allRegion]);
 
   useEffect(() => {
-    if (onChange && regions) {
+    if (onChange) {
       if (selectedRegion) {
         onChange(name, selectedRegion.iso_3166_1);
       } else {
         onChange(name, '');
       }
     }
-  }, [onChange, selectedRegion, name, regions]);
+  }, [onChange, selectedRegion, name]);
 
   return (
     <div className="z-40 w-full">

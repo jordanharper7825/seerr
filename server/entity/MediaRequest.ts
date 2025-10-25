@@ -759,7 +759,7 @@ export class MediaRequest {
       }
 
       if (entity.type === MediaType.MOVIE) {
-        const movie = await tmdb.getMovie({ movieId: media.tmdbId });
+        const movie = await tmdb.getMovie({ movieId: media.tmdbId! });
         notificationManager.sendNotification(type, {
           media,
           request: entity,
@@ -778,7 +778,7 @@ export class MediaRequest {
           image: `https://image.tmdb.org/t/p/w600_and_h900_bestv2${movie.poster_path}`,
         });
       } else if (entity.type === MediaType.TV) {
-        const tv = await tmdb.getTvShow({ tvId: media.tmdbId });
+        const tv = await tmdb.getTvShow({ tvId: media.tmdbId! });
         notificationManager.sendNotification(type, {
           media,
           request: entity,

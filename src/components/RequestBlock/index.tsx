@@ -16,7 +16,7 @@ import {
   UserIcon,
   XMarkIcon,
 } from '@heroicons/react/24/solid';
-import { MediaRequestStatus } from '@server/constants/media';
+import { MediaRequestStatus, MediaType } from '@server/constants/media';
 import type { MediaRequest } from '@server/entity/MediaRequest';
 import axios from 'axios';
 import Link from 'next/link';
@@ -44,6 +44,20 @@ interface RequestBlockProps {
   request: MediaRequest;
   onUpdate?: () => void;
 }
+
+// Map server enum/string to client literal union with numeric comparisons to avoid enum-narrowing issues
+const toClientType = (
+  t: MediaType | 'movie' | 'tv' | 'collection'
+): 'movie' | 'tv' | 'collection' => {
+  if (t === 'movie' || t === 'tv' || t === 'collection') {
+    return t;
+  }
+  const v = Number(t);
+  if (v === Number(MediaType.MOVIE)) return 'movie';
+  if (v === Number(MediaType.TV)) return 'tv';
+  // Anything else (e.g., MUSIC) — use a safe fallback
+  return 'collection';
+};
 
 const RequestBlock = ({ request, onUpdate }: RequestBlockProps) => {
   const { user } = useUser();
@@ -80,8 +94,8 @@ const RequestBlock = ({ request, onUpdate }: RequestBlockProps) => {
     <div className="block">
       <RequestModal
         show={showEditModal}
-        tmdbId={request.media.tmdbId}
-        type={request.type}
+        tmdbId={Number(request.media.tmdbId ?? 0)}
+        type={toClientType(request.type as MediaType | 'movie' | 'tv' | 'collection')}
         is4k={request.is4k}
         editRequest={request}
         onCancel={() => setShowEditModal(false)}
@@ -125,9 +139,7 @@ const RequestBlock = ({ request, onUpdate }: RequestBlockProps) => {
             {request.modifiedBy && (
               <div className="flex flex-nowrap">
                 <span className="flex w-40 items-center truncate md:w-auto">
-                  <Tooltip
-                    content={intl.formatMessage(messages.lastmodifiedby)}
-                  >
+                  <Tooltip content={intl.formatMessage(messages.lastmodifiedby)}>
                     <EyeIcon className="mr-1.5 h-5 w-5 flex-shrink-0" />
                   </Tooltip>
                   <Link

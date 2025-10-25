@@ -10,9 +10,18 @@ const messages = defineMessages('components.Discover.RecentlyAddedSlider', {
   recentlyAdded: 'Recently Added',
 });
 
+// Normalize any incoming mediaType to the strict literal union that TmdbTitleCard expects
+const toLiteralType = (mt: unknown): 'movie' | 'tv' =>
+  String(mt).toLowerCase() === 'movie' ? 'movie' : 'tv';
+
+// Ensure tmdbId is a definite number; fall back to id if needed
+const toTmdbId = (item: { tmdbId?: number; id: number }): number =>
+  typeof item.tmdbId === 'number' ? item.tmdbId : item.id;
+
 const RecentlyAddedSlider = () => {
   const intl = useIntl();
   const { hasPermission } = useUser();
+
   const { data: media, error: mediaError } = useSWR<MediaResultsResponse>(
     '/api/v1/media?filter=allavailable&take=20&sort=mediaAdded',
     { revalidateOnMount: true }
@@ -41,9 +50,9 @@ const RecentlyAddedSlider = () => {
           <TmdbTitleCard
             key={`media-slider-item-${item.id}`}
             id={item.id}
-            tmdbId={item.tmdbId}
+            tmdbId={toTmdbId(item)}
             tvdbId={item.tvdbId}
-            type={item.mediaType}
+            type={toLiteralType(item.mediaType)}
           />
         ))}
       />

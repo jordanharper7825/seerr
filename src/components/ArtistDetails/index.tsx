@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
@@ -13,7 +12,6 @@ import Tooltip from '@app/components/Common/Tooltip';
 import ExternalLinkBlock from '@app/components/ExternalLinkBlock';
 import RequestButton from '@app/components/RequestButton';
 import StatusBadge from '@app/components/StatusBadge';
-import useSettings from '@app/hooks/useSettings';
 import { Permission, useUser } from '@app/hooks/useUser';
 import defineMessages from '@app/utils/defineMessages';
 import ErrorPage from '@app/pages/_error';
@@ -124,8 +122,7 @@ const AlbumList = ({ albums, title, emptyMessage }: AlbumListProps) => {
 };
 
 const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
-  const settings = useSettings();
-  const { user, hasPermission } = useUser();
+  const { hasPermission } = useUser();
   const router = useRouter();
   const intl = useIntl();
   const [showManager, setShowManager] = useState(false);
@@ -217,8 +214,9 @@ const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
                 status={artistData.mediaInfo.status}
                 title={artistData.name}
                 inProgress={false}
-                tmdbId={artistData.mediaInfo.id}
-                mediaType="music"
+                tmdbId={Number(artistData.mediaInfo.id)}
+                // TODO: widen StatusBadge prop to MediaType and remove cast
+                mediaType={MediaType.MUSIC as any}
               />
             )}
           </div>
@@ -244,9 +242,10 @@ const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
         </div>
         <div className="media-actions">
           <RequestButton
-            mediaType="music"
-            media={artistData.mediaInfo}
-            tmdbId={artistData.id}
+            // TODO: widen RequestButton prop to MediaType and remove cast
+            mediaType={MediaType.MUSIC as any}
+            media={artistData.mediaInfo as any}
+            tmdbId={Number(artistData.mediaInfo?.id ?? 0)}
             onUpdate={() => revalidate()}
           />
           {hasPermission(Permission.MANAGE_REQUESTS) &&
@@ -352,7 +351,8 @@ const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
             )}
             <div className="media-fact">
               <ExternalLinkBlock
-                mediaType="music"
+                // TODO: widen ExternalLinkBlock prop to include 'music' and remove cast
+                mediaType={MediaType.MUSIC as any}
                 musicbrainzId={artistData.id}
                 externalLinks={artistData.links}
               />

@@ -24,6 +24,12 @@ type ListViewProps = {
   mutateParent?: () => void;
 };
 
+// force any incoming variant to 'movie' | 'tv' without enum comparisons
+const toLiteralType = (mt: unknown): 'movie' | 'tv' => {
+  const v = String(mt).toLowerCase();
+  return v === 'movie' ? 'movie' : 'tv';
+};
+
 const ListView = ({
   items,
   isEmpty,
@@ -56,7 +62,7 @@ const ListView = ({
               <TmdbTitleCard
                 id={title.tmdbId}
                 tmdbId={title.tmdbId}
-                type={title.mediaType}
+                type={toLiteralType(title.mediaType)}
                 isAddedToWatchlist={true}
                 canExpand
                 mutateParent={mutateParent}

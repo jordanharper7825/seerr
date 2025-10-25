@@ -14,6 +14,10 @@ const messages = defineMessages('components.Discover.PlexWatchlistSlider', {
     'Media added to your <PlexWatchlistSupportLink>Plex Watchlist</PlexWatchlistSupportLink> will appear here.',
 });
 
+// Coerce any incoming mediaType to the literal union expected by TmdbTitleCard
+const toLiteralType = (mt: unknown): 'movie' | 'tv' =>
+  String(mt).toLowerCase() === 'movie' ? 'movie' : 'tv';
+
 const PlexWatchlistSlider = () => {
   const intl = useIntl();
   const { user } = useUser();
@@ -66,7 +70,7 @@ const PlexWatchlistSlider = () => {
             id={item.tmdbId}
             key={`watchlist-slider-item-${item.ratingKey}`}
             tmdbId={item.tmdbId}
-            type={item.mediaType}
+            type={toLiteralType(item.mediaType)}
             isAddedToWatchlist={true}
           />
         ))}
