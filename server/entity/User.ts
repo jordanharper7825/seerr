@@ -340,6 +340,30 @@ export class User {
         ).reduce((sum: number, req: MediaRequest) => sum + req.seasonCount, 0)
       : 0;
 
+    const musicQuotaLimit = !canBypass
+      ? this.musicQuotaLimit ?? defaultQuotas.music.quotaLimit
+      : 0;
+    const musicQuotaDays = this.musicQuotaDays ?? defaultQuotas.music.quotaDays;
+
+    // Count music requests made during quota period
+    const musicDate = new Date();
+    if (musicQuotaDays) {
+      musicDate.setDate(musicDate.getDate() - musicQuotaDays);
+    }
+
+    const musicQuotaUsed = musicQuotaLimit
+      ? await requestRepository.count({
+          where: {
+            requestedBy: {
+              id: this.id,
+            },
+            createdAt: AfterDate(musicDate),
+            type: MediaType.MUSIC,
+            status: Not(MediaRequestStatus.DECLINED),
+          },
+        })
+      : 0;
+
     return {
       movie: {
         days: movieQuotaDays,
@@ -362,6 +386,18 @@ export class User {
           : undefined,
         restricted:
           tvQuotaLimit && tvQuotaLimit - tvQuotaUsed <= 0 ? true : false,
+      },
+      music: {
+        days: musicQuotaDays,
+        limit: musicQuotaLimit,
+        used: musicQuotaUsed,
+        remaining: musicQuotaLimit
+          ? Math.max(0, musicQuotaLimit - musicQuotaUsed)
+          : undefined,
+        restricted:
+          musicQuotaLimit && musicQuotaLimit - musicQuotaUsed <= 0
+            ? true
+            : false,
       },
     };
   }

@@ -1,5 +1,6 @@
 import TitleCard from '@app/components/TitleCard';
 import { Permission, useUser } from '@app/hooks/useUser';
+import type { MediaType } from '@server/constants/media';
 import type { MovieDetails } from '@server/models/Movie';
 import type { TvDetails } from '@server/models/Tv';
 import { useInView } from 'react-intersection-observer';
@@ -53,7 +54,7 @@ const TmdbTitleCard = ({
         id={id}
         tmdbId={tmdbId}
         tvdbId={tvdbId}
-        type={type}
+        type={type as MediaType}
       />
     ) : null;
   }

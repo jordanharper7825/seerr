@@ -5,7 +5,36 @@ import { randomUUID } from 'crypto';
 import fs from 'fs/promises';
 import { merge } from 'lodash';
 import path from 'path';
-import webpush from 'web-push';
+
+// Type for region/country data
+export interface Region {
+  iso_3166_1: string;
+  name: string;
+}
+
+// Type for language data
+export interface Language {
+  iso_639_1: string;
+  english_name: string;
+  name: string;
+}
+
+// Type for job IDs
+export type JobId =
+  | 'plex-recently-added-scan'
+  | 'plex-full-scan'
+  | 'plex-refresh-token'
+  | 'plex-watchlist-sync'
+  | 'jellyfin-recently-added-scan'
+  | 'jellyfin-full-scan'
+  | 'radarr-scan'
+  | 'sonarr-scan'
+  | 'lidarr-scan'
+  | 'availability-sync'
+  | 'download-sync'
+  | 'download-sync-reset'
+  | 'image-cache-cleanup'
+  | 'process-blacklisted-tags';
 
 /* --------------------------------------------------------
  * NOTIFICATION AGENTS
@@ -33,6 +62,18 @@ export interface NotificationAgentEmail extends NotificationAgentConfig {
     senderName: string;
     pgpPrivateKey?: string;
     pgpPassword?: string;
+  };
+}
+
+export interface NotificationAgentNtfy extends NotificationAgentConfig {
+  options: {
+    url: string;
+    topic: string;
+    authMethodUsernamePassword?: boolean;
+    username?: string;
+    password?: string;
+    authMethodToken?: boolean;
+    token?: string;
   };
 }
 
@@ -307,7 +348,10 @@ class Settings {
         apiKey: '',
       },
       tautulli: {},
-      metadataSettings: { tv: MetadataProviderType.TMDB, anime: MetadataProviderType.TMDB },
+      metadataSettings: {
+        tv: MetadataProviderType.TMDB,
+        anime: MetadataProviderType.TMDB,
+      },
       radarr: [],
       sonarr: [],
       lidarr: [],

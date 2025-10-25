@@ -1,5 +1,5 @@
-import useSWR from 'swr';
 import axios from 'axios';
+import useSWR from 'swr';
 
 export interface MusicArtist {
   id: string; // MusicBrainz ID
@@ -22,17 +22,17 @@ export interface MusicArtist {
     fanart?: string;
   };
   rating?: number;
-  links: Array<{
+  links: {
     type: string;
     url: string;
-  }>;
-  similarArtists?: any[];
+  }[];
+  similarArtists?: unknown[];
   playcount?: number;
   listeners?: number;
   mediaInfo?: {
     id: number;
     status: number;
-    requests?: any[];
+    requests?: unknown[];
   };
 }
 
@@ -43,10 +43,10 @@ export interface MusicAlbum {
   releaseDate?: string;
   albumType: string; // Album, EP, Single, Compilation, Soundtrack
   secondaryTypes?: string[];
-  artistCredit: Array<{
+  artistCredit: {
     name: string;
     artistId: string;
-  }>;
+  }[];
   coverArt?: string;
   trackCount?: number;
   rating?: number;
@@ -57,7 +57,7 @@ export interface MusicAlbum {
 export const useArtist = (artistId: string) => {
   const { data, error, mutate } = useSWR<MusicArtist>(
     artistId ? `/api/v1/music/${artistId}` : null,
-    (url) => axios.get(url).then((res) => res.data)
+    (url: string) => axios.get(url).then((res) => res.data)
   );
 
   return {
@@ -71,7 +71,7 @@ export const useArtist = (artistId: string) => {
 export const useArtistAlbums = (artistId: string) => {
   const { data, error, mutate } = useSWR<MusicAlbum[]>(
     artistId ? `/api/v1/music/${artistId}/albums` : null,
-    (url) => axios.get(url).then((res) => res.data)
+    (url: string) => axios.get(url).then((res) => res.data)
   );
 
   return {
@@ -82,7 +82,9 @@ export const useArtistAlbums = (artistId: string) => {
   };
 };
 
-export const searchArtists = async (query: string): Promise<{ results: MusicArtist[] }> => {
+export const searchArtists = async (
+  query: string
+): Promise<{ results: MusicArtist[] }> => {
   const response = await axios.get(`/api/v1/music/search`, {
     params: { query },
   });

@@ -1,23 +1,27 @@
-import { useState, useCallback } from 'react';
-import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
-import useSWR from 'swr';
-import type { MusicArtist, MusicAlbum } from '@app/hooks/useMusic';
+import Button from '@app/components/Common/Button';
 import CachedImage from '@app/components/Common/CachedImage';
 import LoadingSpinner from '@app/components/Common/LoadingSpinner';
 import PageTitle from '@app/components/Common/PageTitle';
-import Button from '@app/components/Common/Button';
 import Tag from '@app/components/Common/Tag';
 import Tooltip from '@app/components/Common/Tooltip';
 import ExternalLinkBlock from '@app/components/ExternalLinkBlock';
 import RequestButton from '@app/components/RequestButton';
 import StatusBadge from '@app/components/StatusBadge';
+import type { MusicAlbum, MusicArtist } from '@app/hooks/useMusic';
 import { Permission, useUser } from '@app/hooks/useUser';
-import defineMessages from '@app/utils/defineMessages';
 import ErrorPage from '@app/pages/_error';
-import { MediaStatus, MediaType } from '@server/constants/media';
-import { CogIcon, MusicalNoteIcon, StarIcon } from '@heroicons/react/24/outline';
+import defineMessages from '@app/utils/defineMessages';
+import {
+  CogIcon,
+  MusicalNoteIcon,
+  StarIcon,
+} from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
+import { MediaStatus, MediaType } from '@server/constants/media';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+import useSWR from 'swr';
 
 const messages = defineMessages('components.ArtistDetails', {
   biography: 'Biography',
@@ -54,7 +58,7 @@ interface AlbumListProps {
   emptyMessage: string;
 }
 
-const AlbumList = ({ albums, title, emptyMessage }: AlbumListProps) => {
+const AlbumList = ({ albums, title }: AlbumListProps) => {
   const intl = useIntl();
   const [showAll, setShowAll] = useState(false);
   const displayAlbums = showAll ? albums : albums.slice(0, 6);
@@ -70,7 +74,7 @@ const AlbumList = ({ albums, title, emptyMessage }: AlbumListProps) => {
         {displayAlbums.map((album) => (
           <div
             key={album.id}
-            className="flex gap-3 rounded-lg bg-gray-800 p-3 ring-1 ring-gray-700 transition duration-200 hover:bg-gray-750"
+            className="hover:bg-gray-750 flex gap-3 rounded-lg bg-gray-800 p-3 ring-1 ring-gray-700 transition duration-200"
           >
             <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded">
               {album.coverArt ? (
@@ -111,9 +115,13 @@ const AlbumList = ({ albums, title, emptyMessage }: AlbumListProps) => {
           onClick={() => setShowAll(!showAll)}
           className="mt-4 flex items-center gap-2 text-sm text-gray-400 transition hover:text-white"
         >
-          <span>{showAll ? 'Show Less' : intl.formatMessage(messages.viewAll)}</span>
+          <span>
+            {showAll ? 'Show Less' : intl.formatMessage(messages.viewAll)}
+          </span>
           <ChevronDownIcon
-            className={`h-4 w-4 transition-transform ${showAll ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 transition-transform ${
+              showAll ? 'rotate-180' : ''
+            }`}
           />
         </button>
       )}
@@ -125,7 +133,6 @@ const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
   const { hasPermission } = useUser();
   const router = useRouter();
   const intl = useIntl();
-  const [showManager, setShowManager] = useState(false);
 
   const {
     data: artistData,
@@ -138,8 +145,6 @@ const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
   const { data: albums } = useSWR<MusicAlbum[]>(
     artistData ? `/api/v1/music/${artistData.id}/albums` : null
   );
-
-  const closeManager = useCallback(() => setShowManager(false), []);
 
   if (!artistData && !artistError) {
     return <LoadingSpinner />;
@@ -245,7 +250,7 @@ const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
             // TODO: widen RequestButton prop to MediaType and remove cast
             mediaType={MediaType.MUSIC as any}
             media={artistData.mediaInfo as any}
-            tmdbId={Number(artistData.mediaInfo?.id ?? 0)}
+            tmdbId={artistData.id as any}
             onUpdate={() => revalidate()}
           />
           {hasPermission(Permission.MANAGE_REQUESTS) &&
@@ -274,7 +279,10 @@ const ArtistDetails = ({ artist }: ArtistDetailsProps) => {
           {artistData.tags && artistData.tags.length > 0 && (
             <div className="mt-6">
               {artistData.tags.slice(0, 10).map((tag) => (
-                <span key={`tag-${tag}`} className="mb-2 mr-2 inline-flex last:mr-0">
+                <span
+                  key={`tag-${tag}`}
+                  className="mb-2 mr-2 inline-flex last:mr-0"
+                >
                   <Tag>{tag}</Tag>
                 </span>
               ))}

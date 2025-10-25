@@ -14,7 +14,7 @@ const messages = defineMessages('components.QuotaSelector', {
 });
 
 interface QuotaSelectorProps {
-  mediaType: 'movie' | 'tv';
+  mediaType: 'movie' | 'tv' | 'music';
   defaultDays?: number;
   defaultLimit?: number;
   dayOverride?: number;

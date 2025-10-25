@@ -50,7 +50,7 @@ export type RequestOverrides = {
 };
 
 interface AdvancedRequesterProps {
-  type: 'movie' | 'tv';
+  type: 'movie' | 'tv' | 'music';
   is4k: boolean;
   isAnime?: boolean;
   defaultOverrides?: RequestOverrides;
@@ -69,7 +69,9 @@ const AdvancedRequester = ({
   const intl = useIntl();
   const { user: currentUser, hasPermission: currentHasPermission } = useUser();
   const { data, error } = useSWR<ServiceCommonServer[]>(
-    `/api/v1/service/${type === 'movie' ? 'radarr' : 'sonarr'}`,
+    `/api/v1/service/${
+      type === 'movie' ? 'radarr' : type === 'music' ? 'lidarr' : 'sonarr'
+    }`,
     {
       refreshInterval: 0,
       refreshWhenHidden: false,

@@ -396,7 +396,9 @@ const RequestItem = ({ request, revalidateList }: RequestItemProps) => {
     <>
       <RequestModal
         show={showEditModal}
-        tmdbId={request.media.tmdbId}
+        tmdbId={
+          request.media.tmdbId ?? (request.media.musicbrainzId as any) ?? 0
+        }
         type={request.type}
         is4k={request.is4k}
         editRequest={request}
